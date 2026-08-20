@@ -1,0 +1,32 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [ "main" ] # 默认推送到 main 分支时自动触发
+  workflow_dispatch: # 支持在 GitHub 网页手动点击触发
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+
+    - name: 配置 JDK 17
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - name: 赋予 Gradle 执行权限
+      run: chmod +x gradlew
+
+    - name: 使用 Gradle 编译 Debug 版 APK
+      run: ./gradlew assembleDebug
+
+    - name: 上传 APK 产物
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-debug
+        path: app/build/outputs/apk/debug/app-debug.apk
